@@ -1,5 +1,8 @@
 {
-  "version": "1.0.0",
-  "notes": "Initial release",
-  "pub_date": "2024-07-28T12:00:00Z"
+  "version": "1.0.1",
+  "notes": "Setup OTA Updates and GitHub Actions.",
+  "pub_date": "2024-07-28T12:00:00Z",
+  "download_url": "https://github.com/01000001-01001110/dark_macro_tool/releases/download/v1.0.1/your_file.zip",
+  "checksum": "d41d8cd98f00b204e9800998ecf8427e",
+  "size": 10485760
 }
