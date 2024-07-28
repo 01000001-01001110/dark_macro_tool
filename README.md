@@ -17,9 +17,9 @@ The **Dark Macro Tool** is my Python application designed to facilitate the reco
 
 To set up the Dark Macro Tool, install the necessary dependencies using the following command:
 
-/```bash
+```bash
 pip install PySide6 requests appdirs pynput pygetwindow pywin32
-/```
+```
 
 ### Dependency Overview
 
@@ -86,7 +86,3 @@ The **About Dialog** provides information about the Dark Macro Tool, including:
 - **Copyright Information**: Displays the copyright notice, acknowledging the developer's rights.
 
 To access the About Dialog, select "About" from the Help menu. The dialog also includes a close button, allowing users to exit the dialog and return to the main application interface.
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for more details.

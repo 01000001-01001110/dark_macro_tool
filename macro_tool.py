@@ -16,7 +16,7 @@ from ota_updater import OTAUpdater
 class MacroTool(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.db_manager = DatabaseManager(app_name='MacroTool', app_author='YourCompanyName')
+        self.db_manager = DatabaseManager(app_name='MacroTool', app_author='Automate & Deploy')
         self.initUI()
         self.current_macro = None
         self.recorder = None
@@ -27,11 +27,6 @@ class MacroTool(QMainWindow):
         self.loop_playback = False
         self.load_macros_from_db()
         QApplication.instance().installEventFilter(self)
-
-        # OTA Update setup
-        self.current_version = "1.0.0"  # Set your current version
-        self.update_url = "https://yourdomain.com/updates"  # Set your update server URL
-        self.updater = OTAUpdater(self.current_version, self.update_url)
 
         # Check for updates every hour
         self.update_timer = QTimer(self)
