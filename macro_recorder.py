@@ -4,7 +4,7 @@ import time
 from key_translator import KeyTranslator
 
 class MacroRecorder(QThread):
-    finished = Signal(list)  # Change pyqtSignal to Signal
+    finished = Signal(list)  # Change pyqtSignal to Signal because pyqt only got me 85% of the way there
 
     def __init__(self):
         super().__init__()

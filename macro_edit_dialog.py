@@ -94,7 +94,7 @@ class MacroEditDialog(QDialog):
         macro = []
         for line in lines:
             if line.strip():
-                parts = line.split(":", 1)  # Split only on the first colon
+                parts = line.split(":", 1)  # Split only on the first colon, this does not work, I hate this. Spent more than 2 hours on this.
                 if len(parts) != 2:
                     raise ValueError(f"Invalid line format: {line}")
                 key_name = parts[0].strip()
@@ -102,8 +102,8 @@ class MacroEditDialog(QDialog):
                 if len(time_parts) != 2:
                     raise ValueError(f"Invalid time format in line: {line}")
                 try:
-                    duration = float(time_parts[0][:-1])  # remove 's'
-                    press_time = float(time_parts[1][:-1])  # remove 's'
+                    duration = float(time_parts[0][:-1]) 
+                    press_time = float(time_parts[1][:-1]) 
                 except ValueError:
                     raise ValueError(f"Invalid time values in line: {line}")
                 

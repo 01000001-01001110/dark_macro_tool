@@ -13,7 +13,7 @@ class KeyTranslator:
         0x08: "Backspace",
         0x09: "Tab",
         0x0D: "Enter",
-        0x10: "Shift",  # Generic Shift
+        0x10: "Shift", 
         0xA1: "Right Shift",
         0xA0: "Left Shift",
         0x11: "Ctrl",
@@ -108,7 +108,7 @@ class KeyTranslator:
     @staticmethod
     def vk_to_string(vk_code):
         if isinstance(vk_code, str):
-            return vk_code  # Already a string representation, return as-is
+            return vk_code  
 
         if vk_code in KeyTranslator._special_keys:
             return KeyTranslator._special_keys[vk_code]
