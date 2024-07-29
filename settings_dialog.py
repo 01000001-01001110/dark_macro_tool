@@ -65,7 +65,7 @@ class SettingsDialog(QDialog):
 
         # Target Application selection
         target_app_layout = QVBoxLayout()
-        target_app_layout.setSpacing(5)  # Smaller spacing for internal elements
+        target_app_layout.setSpacing(5)  # this is internal elements you dummy.
         target_app_layout.addWidget(QLabel("Select Target Application:"))
         self.app_selector = QComboBox()
         self.populate_running_apps()
@@ -106,5 +106,5 @@ class SettingsDialog(QDialog):
     def save_settings(self):
         selected_app = self.app_selector.currentText()
         loop_playback = self.loop_checkbox.isChecked()
-        # Save these settings in your application (e.g., to a config file or database)
+        # Save these settings in db.
         self.accept()

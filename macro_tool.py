@@ -16,6 +16,9 @@ from ota_updater import OTAUpdater
 class MacroTool(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.current_version = "1.0.1"  
+        self.github_repo = "01000001-01001110/dark_macro_tool"  
+        self.updater = OTAUpdater(self.current_version, self.github_repo)
         self.db_manager = DatabaseManager(app_name='MacroTool', app_author='Automate & Deploy')
         self.initUI()
         self.current_macro = None
@@ -32,6 +35,21 @@ class MacroTool(QMainWindow):
         self.update_timer = QTimer(self)
         self.update_timer.timeout.connect(self.check_for_updates)
         self.update_timer.start(3600000)  # 1 hour in milliseconds
+
+    def check_for_updates(self):
+        update_available, latest_release = self.updater.check_for_update()
+        if update_available:
+            reply = QMessageBox.question(self, 'Update Available', 
+                                         f"A new version {latest_release['tag_name']} is available. Would you like to download and install it now?",
+                                         QMessageBox.Yes | QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                asset_url = latest_release['assets'][0]['browser_download_url']
+                if self.updater.download_update(asset_url, self):
+                    self.updater.apply_update()
+                else:
+                    QMessageBox.warning(self, 'Update Failed', "Failed to download the update. Please try again later.")
+        else:
+            QMessageBox.information(self, 'No Updates', "You're running the latest version.")
 
     def initUI(self):
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)

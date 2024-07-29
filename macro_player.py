@@ -37,14 +37,14 @@ class MacroPlayer(QThread):
                         if isinstance(vk_code, int):
                             if KeyTranslator.is_shift_key(vk_code):
                                 if not shift_pressed:
-                                    win32api.keybd_event(0x10, 0, 0, 0)  # Press generic Shift
+                                    win32api.keybd_event(0x10, 0, 0, 0)  
                                     shift_pressed = True
                             else:
                                 win32api.keybd_event(vk_code, 0, 0, 0)
                                 time.sleep(duration)
                                 win32api.keybd_event(vk_code, 0, win32con.KEYEVENTF_KEYUP, 0)
                                 if shift_pressed:
-                                    win32api.keybd_event(0x10, 0, win32con.KEYEVENTF_KEYUP, 0)  # Release generic Shift
+                                    win32api.keybd_event(0x10, 0, win32con.KEYEVENTF_KEYUP, 0)  
                                     shift_pressed = False
                         else:
                             print(f"Simulating key: {key_name}")
@@ -54,7 +54,7 @@ class MacroPlayer(QThread):
                     print(f"Skipping unsupported key: {key_name}")
 
             if shift_pressed:
-                win32api.keybd_event(0x10, 0, win32con.KEYEVENTF_KEYUP, 0)  # Ensure Shift is released at the end
+                win32api.keybd_event(0x10, 0, win32con.KEYEVENTF_KEYUP, 0)  # Ensure Shift is released at the end for the love...
 
             if not self.loop:
                 break

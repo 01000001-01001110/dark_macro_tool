@@ -46,7 +46,7 @@ class AboutDialog(QDialog):
             }
         """)
         self.content_layout = QVBoxLayout(self.content)
-        self.content_layout.setSpacing(10)  # Reduce spacing between elements
+        self.content_layout.setSpacing(10)  
         self.content_layout.setContentsMargins(20, 20, 20, 20)  # Add some padding
 
         self.download_image()
@@ -68,7 +68,7 @@ class AboutDialog(QDialog):
     def setup_ui(self, avatar_pixmap):
         # Avatar and app name
         top_layout = QHBoxLayout()
-        top_layout.setSpacing(10)  # Add some space between image and text
+        top_layout.setSpacing(10)  
         avatar_label = CircularImageLabel(avatar_pixmap)
         top_layout.addWidget(avatar_label)
         
