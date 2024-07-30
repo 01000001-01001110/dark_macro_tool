@@ -24,11 +24,21 @@ jobs:
         run: pyinstaller --name=dark_macro_tool --onefile --windowed --hidden-import=sqlite3 main.py
       
       - name: Create update package
+        shell: pwsh
         run: |
           mkdir update_package
           copy dist\dark_macro_tool.exe update_package\
-          echo '{"version": "${{ github.ref_name }}", "file_updates": [{"src": "dark_macro_tool.exe", "dest": "dark_macro_tool.exe"}]}' > update_package\update_config.json
-          powershell Compress-Archive update_package\* update.zip
+          $updateConfig = @{
+              version = "${{ github.ref_name }}"
+              file_updates = @(
+                  @{
+                      src = "dark_macro_tool.exe"
+                      dest = "dark_macro_tool.exe"
+                  }
+              )
+          }
+          $updateConfig | ConvertTo-Json -Depth 5 | Set-Content update_package\update_config.json
+          Compress-Archive update_package\* update.zip
       
       - name: Create Release
         id: create_release
