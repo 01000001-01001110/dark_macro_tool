@@ -9,21 +9,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.10.6'
-      
-      - name: Install dependencies
+
+      - name: Setup
         run: |
           pip install -r requirements.txt
           pip install pyinstaller
-      
-      - name: Build EXE
+
+      - name: Build Application
         run: pyinstaller --name=dark_macro_tool --onefile --windowed --hidden-import=psutil --hidden-import=sqlite3 main.py
-      
-      - name: Create update package
+
+      - name: Prepare Update Package
         shell: pwsh
         run: |
           mkdir update_package
@@ -39,8 +39,8 @@ jobs:
           }
           $updateConfig | ConvertTo-Json -Depth 5 | Set-Content update_package\update_config.json
           Compress-Archive update_package\* update.zip
-      
-      - name: Create Release
+
+      - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -53,8 +53,8 @@ jobs:
             - Please add release notes here.
           draft: false
           prerelease: false
-      
-      - name: Upload Release Asset (EXE)
+
+      - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -63,8 +63,8 @@ jobs:
           asset_path: ./dist/dark_macro_tool.exe
           asset_name: dark_macro_tool.exe
           asset_content_type: application/octet-stream
-      
-      - name: Upload Release Asset (Update Package)
+
+      - name: Upload Update Package
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
