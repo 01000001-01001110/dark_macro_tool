@@ -54,22 +54,22 @@ jobs:
           draft: false
           prerelease: false
       
-      # - name: Upload Release Asset (EXE)
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-      #     asset_path: ./dist/dark_macro_tool.exe
-      #     asset_name: dark_macro_tool.exe
-      #     asset_content_type: application/octet-stream
+      - name: Upload Release Asset (EXE)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/dark_macro_tool.exe
+          asset_name: dark_macro_tool.exe
+          asset_content_type: application/octet-stream
       
-      # - name: Upload Release Asset (Update Package)
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-      #     asset_path: ./update.zip
-      #     asset_name: update.zip
-      #     asset_content_type: application/zip
+      - name: Upload Release Asset (Update Package)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./update.zip
+          asset_name: update.zip
+          asset_content_type: application/zip
