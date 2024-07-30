@@ -27,7 +27,7 @@ jobs:
         run: |
           mkdir update_package
           copy dist\dark_macro_tool.exe update_package\
-          echo {"version": "${{ github.ref_name }}", "file_updates": [{"src": "dark_macro_tool.exe", "dest": "dark_macro_tool.exe"}]} > update_package\update_config.json
+          echo '{"version": "${{ github.ref_name }}", "file_updates": [{"src": "dark_macro_tool.exe", "dest": "dark_macro_tool.exe"}]}' > update_package\update_config.json
           powershell Compress-Archive update_package\* update.zip
       
       - name: Create Release
