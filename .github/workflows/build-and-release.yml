@@ -21,7 +21,7 @@ jobs:
           pip install pyinstaller
       
       - name: Build EXE
-        run: pyinstaller --name=dark_macro_tool --onefile --windowed --hidden-import=sqlite3 main.py
+        run: pyinstaller --name=dark_macro_tool --onefile --windowed --hidden-import=psutil --hidden-import=sqlite3 main.py
       
       - name: Create update package
         shell: pwsh
