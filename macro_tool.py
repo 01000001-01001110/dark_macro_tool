@@ -1,8 +1,12 @@
+import sys
+import os
+import requests
+import subprocess
 from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                                QListWidget, QLineEdit, QPushButton, QMenuBar, QMenu, 
                                QApplication, QDialog, QMessageBox)
 from PySide6.QtCore import Qt, QEvent, QTimer
-from PySide6.QtGui import QAction  # Add this line
+from PySide6.QtGui import QAction
 from settings_dialog import SettingsDialog
 from macro_recorder import MacroRecorder
 from macro_player import MacroPlayer
@@ -11,14 +15,12 @@ from database_manager import DatabaseManager
 from about_dialog import AboutDialog
 from styled_widgets import StylizedLineEdit, StylizedButton
 from title_bar import TitleBar
-from ota_updater import OTAUpdater
 
 class MacroTool(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.current_version = "1.0.1"  
-        self.github_repo = "01000001-01001110/dark_macro_tool"  
-        self.updater = OTAUpdater(self.current_version, self.github_repo)
+        self.current_version = "1.0.1"
+        self.github_repo = "01000001-01001110/dark_macro_tool"
         self.db_manager = DatabaseManager(app_name='MacroTool', app_author='Automate & Deploy')
         self.initUI()
         self.current_macro = None
@@ -28,6 +30,7 @@ class MacroTool(QMainWindow):
         self.is_playing = False
         self.selected_app = "Select an app (optional)"
         self.loop_playback = False
+        self.vary_speed = False
         self.load_macros_from_db()
         QApplication.instance().installEventFilter(self)
 
@@ -35,21 +38,6 @@ class MacroTool(QMainWindow):
         self.update_timer = QTimer(self)
         self.update_timer.timeout.connect(self.check_for_updates)
         self.update_timer.start(3600000)  # 1 hour in milliseconds
-
-    def check_for_updates(self):
-        update_available, latest_release = self.updater.check_for_update()
-        if update_available:
-            reply = QMessageBox.question(self, 'Update Available', 
-                                         f"A new version {latest_release['tag_name']} is available. Would you like to download and install it now?",
-                                         QMessageBox.Yes | QMessageBox.No)
-            if reply == QMessageBox.Yes:
-                asset_url = latest_release['assets'][0]['browser_download_url']
-                if self.updater.download_update(asset_url, self):
-                    self.updater.apply_update()
-                else:
-                    QMessageBox.warning(self, 'Update Failed', "Failed to download the update. Please try again later.")
-        else:
-            QMessageBox.information(self, 'No Updates', "You're running the latest version.")
 
     def initUI(self):
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
@@ -165,27 +153,56 @@ class MacroTool(QMainWindow):
 
     def open_settings(self):
         settings_dialog = SettingsDialog(self)
+        settings_dialog.app_selector.setCurrentText(self.selected_app)
+        settings_dialog.loop_checkbox.setChecked(self.loop_playback)
+        settings_dialog.vary_speed_checkbox.setChecked(self.vary_speed)
         if settings_dialog.exec() == QDialog.Accepted:
             self.selected_app = settings_dialog.app_selector.currentText()
             self.loop_playback = settings_dialog.loop_checkbox.isChecked()
-            print(f"Settings Updated: App: {self.selected_app}, Loop: {self.loop_playback}")
+            self.vary_speed = settings_dialog.vary_speed_checkbox.isChecked()
+            print(f"Settings Updated: App: {self.selected_app}, Loop: {self.loop_playback}, Vary Speed: {self.vary_speed}")
 
     def open_about(self):
         about_dialog = AboutDialog(self)
         about_dialog.exec()
 
     def check_for_updates(self):
-        if self.updater.check_for_update():
-            reply = QMessageBox.question(self, 'Update Available', 
-                                         "An update is available. Would you like to download and install it now?",
-                                         QMessageBox.Yes | QMessageBox.No)
-            if reply == QMessageBox.Yes:
-                if self.updater.download_update(self):
-                    self.updater.apply_update()
-                else:
-                    QMessageBox.warning(self, 'Update Failed', "Failed to download the update. Please try again later.")
-        else:
-            QMessageBox.information(self, 'No Updates', "You're running the latest version.")
+        try:
+            api_url = f"https://api.github.com/repos/{self.github_repo}/releases/latest"
+            response = requests.get(api_url)
+            response.raise_for_status()
+            latest_release = response.json()
+            latest_version = latest_release['tag_name'].lstrip('v')
+            
+            if self._compare_versions(latest_version, self.current_version):
+                reply = QMessageBox.question(self, 'Update Available', 
+                                             f"A new version {latest_version} is available. Would you like to update now?",
+                                             QMessageBox.Yes | QMessageBox.No)
+                if reply == QMessageBox.Yes:
+                    self._start_update_process(latest_release['assets'][0]['browser_download_url'])
+            else:
+                QMessageBox.information(self, 'No Updates', "You're running the latest version.")
+        except requests.RequestException as e:
+            QMessageBox.warning(self, 'Update Check Failed', f"Failed to check for updates: {str(e)}")
+
+    def _compare_versions(self, version1, version2):
+        v1_parts = [int(part) for part in version1.split('.')]
+        v2_parts = [int(part) for part in version2.split('.')]
+        return v1_parts > v2_parts
+
+    def _start_update_process(self, download_url):
+        updater_path = os.path.join(os.path.dirname(sys.executable), "updater.exe")
+        if not os.path.exists(updater_path):
+            QMessageBox.warning(self, 'Update Failed', "Updater not found. Please reinstall the application.")
+            return
+
+        # Start the updater process
+        subprocess.Popen([updater_path, download_url, sys.executable])
+        
+        # Close the current application
+        QMessageBox.information(self, 'Updating', "The application will now close and update. Please restart it after the update is complete.")
+        self.close()
+        sys.exit(0)
 
     def toggle_recording(self):
         if not self.is_recording:
@@ -263,7 +280,7 @@ class MacroTool(QMainWindow):
                 self.current_macro = macro
                 self.play_button.setText("Stop")
                 self.is_playing = True
-                self.player = MacroPlayer(self.current_macro, self.selected_app, self.loop_playback)
+                self.player = MacroPlayer(self.current_macro, self.selected_app, self.loop_playback, self.vary_speed)
                 self.player.finished.connect(self.on_playback_finished)
                 self.player.start()
                 
@@ -357,3 +374,9 @@ class MacroTool(QMainWindow):
             self.player.wait()
         self.db_manager.close()
         event.accept()
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = MacroTool()
+    ex.show()
+    sys.exit(app.exec())
