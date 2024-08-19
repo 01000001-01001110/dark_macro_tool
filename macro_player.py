@@ -1,3 +1,4 @@
+import random
 from PySide6.QtCore import QThread
 import time
 import pygetwindow as gw
@@ -6,11 +7,12 @@ import win32con
 from key_translator import KeyTranslator
 
 class MacroPlayer(QThread):
-    def __init__(self, macro, app_name=None, loop=False):
+    def __init__(self, macro, app_name=None, loop=False, vary_speed=False):
         super().__init__()
         self.macro = macro
         self.app_name = app_name
         self.loop = loop
+        self.vary_speed = vary_speed
 
     def run(self):
         while True:
@@ -27,6 +29,11 @@ class MacroPlayer(QThread):
             for action in self.macro:
                 key_name, press_time, duration = action
                 current_time = time.time() - start_time
+                
+                if self.vary_speed:
+                    press_time = self.vary_timing(press_time)
+                    duration = self.vary_timing(duration)
+
                 if current_time < press_time:
                     time.sleep(press_time - current_time)
 
@@ -54,8 +61,13 @@ class MacroPlayer(QThread):
                     print(f"Skipping unsupported key: {key_name}")
 
             if shift_pressed:
-                win32api.keybd_event(0x10, 0, win32con.KEYEVENTF_KEYUP, 0)  # Ensure Shift is released at the end for the love...
+                win32api.keybd_event(0x10, 0, win32con.KEYEVENTF_KEYUP, 0)
 
             if not self.loop:
                 break
         print("Macro playback completed")
+
+    def vary_timing(self, original_time):
+        # Vary the timing by ±20%
+        variation = random.uniform(-0.2, 0.2)
+        return max(0.01, original_time * (1 + variation))  # Ensure time is always positive
